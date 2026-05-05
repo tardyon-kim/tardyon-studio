@@ -29,6 +29,7 @@ Each round should:
 |-------|--------|-------|--------|
 | 1 | `2026-05-05-round-1-harness-coherence.md` | Toolchain role clarity, harness coherence, gstack remains optional | Passed |
 | 2 | `2026-05-05-round-2-product-dry-run.md` | Generated product dry run without product-domain decisions | Passed |
+| 3 | `2026-05-05-round-3-release-readiness.md` | Release evidence for offline/on-prem handoff | Passed |
 
 ## Durable Toolchain Position
 

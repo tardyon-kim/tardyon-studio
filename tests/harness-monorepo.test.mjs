@@ -201,4 +201,98 @@ describe("reference monorepo harness", () => {
       "package.json devDependency @aws-amplify/auth"
     ]);
   });
+
+  it("declares a release readiness evidence gate", () => {
+    const pkg = readJson(fromRoot("package.json"));
+    const scriptPath = fromRoot("scripts/check-release-readiness.mjs");
+    const lifecyclePath = fromRoot("docs/lifecycle/release-readiness.md");
+    const rubricPath = fromRoot("docs/rubrics/release-readiness.md");
+    const ciLocal = readFileSync(fromRoot("scripts/ci-local.mjs"), "utf8");
+    const workflow = readFileSync(fromRoot(".github/workflows/ci.yml"), "utf8");
+
+    assert.equal(pkg.scripts["check:release-readiness"], "node scripts/check-release-readiness.mjs");
+    assert.equal(existsSync(scriptPath), true, "missing release readiness check script");
+    assert.equal(existsSync(lifecyclePath), true, "missing release readiness lifecycle doc");
+    assert.equal(existsSync(rubricPath), true, "missing release readiness rubric");
+    assert.match(ciLocal, /check:release-readiness/);
+    assert.match(workflow, /check:release-readiness/);
+  });
+
+  it("generates SBOM evidence for all package manifests", () => {
+    const tempRoot = mkdtempSync(join(tmpdir(), "harness-sbom-"));
+
+    try {
+      for (const path of [
+        "apps/api",
+        "apps/web",
+        "packages/config",
+        "packages/db",
+        "packages/shared",
+        "templates/product-starter/apps/api",
+        "templates/product-starter/apps/web",
+        "templates/product-starter"
+      ]) {
+        mkdirSync(join(tempRoot, path), { recursive: true });
+      }
+
+      for (const path of [
+        "package.json",
+        "apps/api/package.json",
+        "apps/web/package.json",
+        "packages/config/package.json",
+        "packages/db/package.json",
+        "packages/shared/package.json",
+        "templates/product-starter/apps/api/package.json",
+        "templates/product-starter/apps/web/package.json",
+        "templates/product-starter/package.json"
+      ]) {
+        writeFileSync(join(tempRoot, path), JSON.stringify({
+          name: path.replaceAll("/", "-").replace(".json", ""),
+          version: "0.1.0",
+          private: true
+        }), "utf8");
+      }
+
+      const result = spawnSync(process.execPath, [fromRoot("scripts/generate-sbom.mjs")], {
+        cwd: tempRoot,
+        encoding: "utf8",
+        env: {
+          ...process.env,
+          HARNESS_ROOT_OVERRIDE: tempRoot
+        }
+      });
+
+      assert.equal(result.status, 0, result.stderr);
+
+      const sbom = readJson(join(tempRoot, "dist/sbom/sbom-lite.json"));
+      const componentPaths = (sbom.components ?? []).map((component) => component.path).sort();
+
+      assert.deepEqual(componentPaths, [
+        "apps/api/package.json",
+        "apps/web/package.json",
+        "package.json",
+        "packages/config/package.json",
+        "packages/db/package.json",
+        "packages/shared/package.json",
+        "templates/product-starter/apps/api/package.json",
+        "templates/product-starter/apps/web/package.json",
+        "templates/product-starter/package.json"
+      ]);
+    } finally {
+      rmSync(tempRoot, { recursive: true, force: true });
+    }
+  });
+
+  it("parses release checksum evidence with exact paths", async () => {
+    const rules = await import("../scripts/lib/release-readiness-rules.mjs");
+    const validHash = "a".repeat(64);
+    const entries = rules.parseChecksumEntries([
+      `${validHash}  templates/product-starter/docker/Dockerfile.api.bak`,
+      `${validHash}  templates/product-starter/docker/Dockerfile.web`
+    ].join("\n"));
+
+    assert.equal(entries.has("templates/product-starter/docker/Dockerfile.api"), false);
+    assert.equal(entries.has("templates/product-starter/docker/Dockerfile.web"), true);
+    assert.equal(entries.get("templates/product-starter/docker/Dockerfile.web"), validHash);
+  });
 });

@@ -86,8 +86,11 @@ npm run check:implementation
 npm run check:toolchain
 npm run check:product-dry-run
 npm run compose:validate
+npm run sbom
+npm run checksums
 npm run bundle:offline
 npm run bundle:verify
+npm run check:release-readiness
 ```
 
 ## Evolution Model

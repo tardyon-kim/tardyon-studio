@@ -58,3 +58,6 @@ jobs:
 
       - name: Verify offline bundle
         run: npm run bundle:verify
+
+      - name: Check release readiness
+        run: npm run check:release-readiness

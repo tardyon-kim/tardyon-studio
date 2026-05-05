@@ -13,7 +13,8 @@ const checks = [
   ["sbom", ["run", "sbom"]],
   ["checksums", ["run", "checksums"]],
   ["bundle:offline", ["run", "bundle:offline"]],
-  ["bundle:verify", ["run", "bundle:verify"]]
+  ["bundle:verify", ["run", "bundle:verify"]],
+  ["check:release-readiness", ["run", "check:release-readiness"]]
 ];
 
 const failures = [];
