@@ -114,4 +114,91 @@ describe("reference monorepo harness", () => {
       rmSync(tempRoot, { recursive: true, force: true });
     }
   });
+
+  it("declares a generated product dry-run gate", () => {
+    const pkg = readJson(fromRoot("package.json"));
+    const scriptPath = fromRoot("scripts/check-product-dry-run.mjs");
+    const ciLocal = readFileSync(fromRoot("scripts/ci-local.mjs"), "utf8");
+    const workflow = readFileSync(fromRoot(".github/workflows/ci.yml"), "utf8");
+    const implementationCheck = readFileSync(fromRoot("scripts/check-implementation.mjs"), "utf8");
+    const validationIndex = readFileSync(fromRoot("docs/validation/README.md"), "utf8");
+
+    assert.equal(pkg.scripts["check:product-dry-run"], "node scripts/check-product-dry-run.mjs");
+    assert.equal(existsSync(scriptPath), true, "missing product dry-run check script");
+    assert.match(ciLocal, /check:product-dry-run/);
+    assert.match(workflow, /check:product-dry-run/);
+    assert.match(validationIndex, /Generated product dry run/);
+    assert.doesNotMatch(implementationCheck, /2026-05-05-round-2-product-dry-run\.md/);
+  });
+
+  it("defines reusable product dry-run validation rules", async () => {
+    const rules = await import("../scripts/lib/product-dry-run-rules.mjs");
+    const compose = [
+      "environment:",
+      "  POSTGRES_DB: ${POSTGRES_DB:-app}",
+      "  DATABASE_URL: ${DATABASE_URL}",
+      "  REQUIRED_VALUE: ${REQUIRED_VALUE?set it}",
+      "  DASH_DEFAULT: ${DASH_DEFAULT-local}",
+      "  PLUS_VALUE: ${PLUS_VALUE+enabled}",
+      "  COLON_PLUS_VALUE: ${COLON_PLUS_VALUE:+enabled}",
+      "ports:",
+      "  - \"${WEB_PORT:-3000}:3000\"",
+      "healthcheck:",
+      "  test: [\"CMD-SHELL\", \"echo $${ESCAPED_VAR:-ignored}\"]"
+    ].join("\n");
+    const env = [
+      "# comment",
+      "POSTGRES_DB=app",
+      "DATABASE_URL=postgresql://app:<set-inside-offline-environment>@postgres:5432/app",
+      "REQUIRED_VALUE=yes",
+      "DASH_DEFAULT=local",
+      "PLUS_VALUE=enabled",
+      "COLON_PLUS_VALUE=enabled",
+      "WEB_PORT=3000"
+    ].join("\n");
+    const packages = [
+      {
+        path: "package.json",
+        json: {
+          dependencies: {
+            "@aws-sdk/client-s3": "latest",
+            "firebase-admin": "latest",
+            "aws-amplify": "latest",
+            react: "latest"
+          },
+          devDependencies: {
+            "@google-cloud/storage": "latest",
+            "@aws-amplify/auth": "latest"
+          }
+        }
+      }
+    ];
+
+    assert.deepEqual([...rules.collectComposeVariables(compose)].sort(), [
+      "COLON_PLUS_VALUE",
+      "DASH_DEFAULT",
+      "DATABASE_URL",
+      "PLUS_VALUE",
+      "POSTGRES_DB",
+      "REQUIRED_VALUE",
+      "WEB_PORT"
+    ]);
+    assert.deepEqual([...rules.parseEnvKeys(env)].sort(), [
+      "COLON_PLUS_VALUE",
+      "DASH_DEFAULT",
+      "DATABASE_URL",
+      "PLUS_VALUE",
+      "POSTGRES_DB",
+      "REQUIRED_VALUE",
+      "WEB_PORT"
+    ]);
+    assert.deepEqual(rules.findMissingEnvKeys(compose, env), []);
+    assert.deepEqual(rules.findCloudRuntimeDependencies(packages), [
+      "package.json dependency @aws-sdk/client-s3",
+      "package.json dependency firebase-admin",
+      "package.json dependency aws-amplify",
+      "package.json devDependency @google-cloud/storage",
+      "package.json devDependency @aws-amplify/auth"
+    ]);
+  });
 });

@@ -84,6 +84,7 @@ Run:
 ```bash
 npm run check:implementation
 npm run check:toolchain
+npm run check:product-dry-run
 npm run compose:validate
 npm run bundle:offline
 npm run bundle:verify

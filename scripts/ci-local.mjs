@@ -9,6 +9,7 @@ const checks = [
   ["check:implementation", ["run", "check:implementation"]],
   ["compose:validate", ["run", "compose:validate"]],
   ["compose:validate:template", ["run", "compose:validate:template"]],
+  ["check:product-dry-run", ["run", "check:product-dry-run"]],
   ["sbom", ["run", "sbom"]],
   ["checksums", ["run", "checksums"]],
   ["bundle:offline", ["run", "bundle:offline"]],

@@ -36,7 +36,8 @@ export function run(command, args, options = {}) {
     cwd: options.cwd ?? rootDir,
     encoding: "utf8",
     shell: false,
-    stdio: options.stdio ?? "pipe"
+    stdio: options.stdio ?? "pipe",
+    timeout: options.timeoutMs
   });
 }
 
