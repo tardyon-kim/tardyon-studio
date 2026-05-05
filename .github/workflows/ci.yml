@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  harness:
+    name: Harness gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Check environment
+        run: npm run check:env
+
+      - name: Check plan
+        run: npm run check:plan
+
+      - name: Test harness
+        run: npm test
+
+      - name: Check implementation
+        run: npm run check:implementation
+
+      - name: Validate Docker Compose
+        run: npm run compose:validate
+
+      - name: Validate product starter Docker Compose
+        run: npm run compose:validate:template
+
+      - name: Generate SBOM-lite
+        run: npm run sbom
+
+      - name: Generate checksums
+        run: npm run checksums
+
+      - name: Create offline bundle
+        run: npm run bundle:offline
+
+      - name: Verify offline bundle
+        run: npm run bundle:verify

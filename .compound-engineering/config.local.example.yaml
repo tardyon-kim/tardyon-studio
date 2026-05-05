@@ -1,0 +1,13 @@
+# Compound Engineering local project config template.
+# Copy to .compound-engineering/config.local.yaml for machine-local settings.
+#
+# This file is safe to commit. The local file is gitignored.
+
+review:
+  # enable_slack_context: false
+  # preferred_review_depth: standard
+
+harness:
+  # default_plan: docs/plans/2026-05-05-001-harness-plan.md
+  # offline_runtime: true
+

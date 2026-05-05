@@ -1,0 +1,17 @@
+{
+  "name": "product-starter",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/web",
+    "apps/api"
+  ],
+  "scripts": {
+    "build": "npm run build -w apps/web && npm run build -w apps/api",
+    "lint": "npm run lint -w apps/web && npm run lint -w apps/api",
+    "test": "npm run test -w apps/api",
+    "typecheck": "npm run typecheck -w apps/web && npm run typecheck -w apps/api",
+    "compose:config": "docker compose -f compose/docker-compose.yml config"
+  }
+}
+

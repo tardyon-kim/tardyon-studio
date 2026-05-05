@@ -1,0 +1,10 @@
+{
+  "name": "@tardyon/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "migrate": "node scripts/migrate-placeholder.mjs"
+  }
+}
+
