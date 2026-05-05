@@ -27,6 +27,8 @@ Development may use internet access. Runtime service environments must not requi
 10. Release with runbooks.
 11. Capture learnings.
 
+The toolchain integration contract is defined in `docs/lifecycle/toolchain-integration.md`. It keeps Compound Engineering, Superpowers, and gstack assigned to distinct roles so the harness remains coherent instead of becoming a loose collection of tools.
+
 ## Reference Monorepo
 
 The harness includes a root reference monorepo:
@@ -81,9 +83,14 @@ Run:
 
 ```bash
 npm run check:implementation
+npm run check:toolchain
+npm run check:product-dry-run
 npm run compose:validate
+npm run sbom
+npm run checksums
 npm run bundle:offline
 npm run bundle:verify
+npm run check:release-readiness
 ```
 
 ## Evolution Model
@@ -102,3 +109,4 @@ v2 may add:
 - Kubernetes profile.
 - Deeper SBOM and vulnerability tooling.
 - More automated release packaging.
+- A formal decision on whether gstack remains optional, gains stricter invocation criteria, or becomes required for specific high-risk review classes.

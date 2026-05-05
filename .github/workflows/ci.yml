@@ -32,6 +32,9 @@ jobs:
       - name: Test harness
         run: npm test
 
+      - name: Check toolchain integration
+        run: npm run check:toolchain
+
       - name: Check implementation
         run: npm run check:implementation
 
@@ -40,6 +43,9 @@ jobs:
 
       - name: Validate product starter Docker Compose
         run: npm run compose:validate:template
+
+      - name: Run generated product dry run
+        run: npm run check:product-dry-run
 
       - name: Generate SBOM-lite
         run: npm run sbom
@@ -52,3 +58,6 @@ jobs:
 
       - name: Verify offline bundle
         run: npm run bundle:verify
+
+      - name: Check release readiness
+        run: npm run check:release-readiness
