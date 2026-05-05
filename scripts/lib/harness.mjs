@@ -1,10 +1,12 @@
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync, copyFileSync } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-export const rootDir = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
+export const rootDir = process.env.HARNESS_ROOT_OVERRIDE
+  ? resolve(process.env.HARNESS_ROOT_OVERRIDE)
+  : join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
 export function rel(path) {
   return relative(rootDir, path).replaceAll("\\", "/");

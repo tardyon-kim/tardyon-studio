@@ -32,6 +32,9 @@ jobs:
       - name: Test harness
         run: npm test
 
+      - name: Check toolchain integration
+        run: npm run check:toolchain
+
       - name: Check implementation
         run: npm run check:implementation
 

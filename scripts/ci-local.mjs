@@ -4,6 +4,7 @@ const checks = [
   ["check:env", ["run", "check:env"]],
   ["check:repo", ["run", "check:repo"]],
   ["test", ["test"]],
+  ["check:toolchain", ["run", "check:toolchain"]],
   ["check:plan", ["run", "check:plan"]],
   ["check:implementation", ["run", "check:implementation"]],
   ["compose:validate", ["run", "compose:validate"]],

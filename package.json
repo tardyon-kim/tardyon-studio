@@ -15,6 +15,7 @@
     "check:repo": "node scripts/check-repo-policy.mjs",
     "check:branch": "node scripts/check-branch-name.mjs",
     "check:commit": "node scripts/check-commit-message.mjs",
+    "check:toolchain": "node scripts/check-toolchain-integration.mjs",
     "check:plan": "node scripts/check-plan.mjs",
     "check:implementation": "node scripts/check-implementation.mjs",
     "lint": "npm run lint -w apps/web && npm run lint -w apps/api",
